@@ -28,11 +28,25 @@ package Lesson_03;
 увидеть стектрейс ошибки.
 */
 
-import java.io.*;
-
-
-
 public class Main {
+    static void RunApp() throws InputException {
+        DataParser dataParser = new DataParser();
+        int inputResult = dataParser.inputData("Введите данные: ");
+
+        switch (inputResult) {
+            case 0 -> dataParser.saveToFile();
+            case -1 -> throw new InputException("Размер введеных данных не корректен" + ", код ошибки " + inputResult);
+            case -2 -> throw new InputException("Количество указанных параметров не совпадает с форматом" +
+                    ", код ошибки " + inputResult);
+            case -3 -> throw new InputException("Параметр ФИО введён не корректрно!" + ", код ошибки " + inputResult);
+            case -4 -> throw new InputException("Параметр Дата введён не корректрно!" + ", код ошибки " + inputResult);
+            case -5 -> throw new InputException("Параметр Номер телефона введён не корректрно!" + ", код ошибки " +
+                    inputResult);
+            case -6 -> throw new InputException("Параметр Пол введён не корректрно!" + ", код ошибки " + inputResult);
+            default -> throw new InputException("Для кода данной ошибки пока нет описания" + ", код ошибки " +
+                    inputResult);
+        }
+    }
     public static void main(String[] args) {
 
         boolean endApp = false;
@@ -57,25 +71,6 @@ public class Main {
                     System.out.println("Программа завершилась без ошибок.");
                 }
             }
-        }
-
-    }
-    static void RunApp() throws InputException {
-        DataParser dataParser = new DataParser();
-        int inputResult = dataParser.inputData("Введите данные: ");
-
-        switch (inputResult) {
-            case 0 -> dataParser.saveToFile();
-            case -1 -> throw new InputException("Размер введеных данных не корректен" + ", код ошибки " + inputResult);
-            case -2 -> throw new InputException("Количество указанных параметров не совпадает с форматом" +
-                    ", код ошибки " + inputResult);
-            case -3 -> throw new InputException("Параметр ФИО введён не корректрно!" + ", код ошибки " + inputResult);
-            case -4 -> throw new InputException("Параметр Дата введён не корректрно!" + ", код ошибки " + inputResult);
-            case -5 -> throw new InputException("Параметр Номер телефона введён не корректрно!" + ", код ошибки " +
-                    inputResult);
-            case -6 -> throw new InputException("Параметр Пол введён не корректрно!" + ", код ошибки " + inputResult);
-            default -> throw new InputException("Для кода данной ошибки пока нет описания" + ", код ошибки " +
-                    inputResult);
         }
     }
 }
