@@ -38,47 +38,127 @@ class InputException extends Exception {
     }
 }
 
-public class Main {
-    public static void main(String[] args) throws InputException, IOException {
-
+class DataParser {
+    private String inData;
+    BufferedReader in;
+    public DataParser() {
+        this.inData = null;
+        this.in = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    public static int inputData(){ //throws InputException, IOException {
-//        int result = 0;
-//        String dataInput = null;
+    int inputData(String title) {
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print(title);
+        try {
+            inData= in.readLine();
+            if(inData.length() == 0){
+                return -1;
+            }
+            String[] parts = inData.split(" ");
+            if(parts.length != 6){
+                return -2;
+            }
 
-         try {
-             String dataInput = in.readLine();
-             if (dataInput == null){
-                 return -1;
-             }else{
-                 if(dataInput.length() == 0){
-                     return -2;
-                 }
-                 String[] parts = dataInput.split(" ");
-                 if(parts.length < 6){
-                    return -3;
-                 }
+            for (String part : parts) {
+                System.out.println(part);
+            }
 
-                 for (String part : parts) {
-                     System.out.println(part);
-                 }
-             }
-         }catch (IOException e) {
-             System.out.println("Ошибка ввода данных: " + e.getMessage());
-         }
+            if(!this.checkFio(parts)){
+                return -3;
+            }
 
+            if(!this.checkDate(parts)){
+                return -4;
+            }
+
+            if(!this.checkPhone(parts)){
+                return -5;
+            }
+
+            if (!this.checkGender(parts)){
+                return -6;
+            }
+
+        }catch (IOException e) {
+            System.out.println("Ошибка ввода данных: " + e.getMessage());
+        }
         return 0;
     }
 
-    static void RunApp() throws InputException{
-        System.out.print("Введите данные: ");
-        int inputResult = inputData();
-        if (inputResult != 0) {
+    public void saveToFile(){
 
+    }
+
+    private boolean checkFio(String[] param) {
+        for (int i = 0; i < 3; i++){
+            if(!param[i].matches("^[a-zA-Zа-яА-я]*$")){
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean checkDate(String[] param) {
+        String regex = "^([0-2][0-9]||3[0-1])\\.(0[0-9]||1[0-2])\\.([0-9][0-9])?[0-9][0-9]$";
+        return param[3].matches(regex);
+    }
+    private boolean checkPhone(String[] param) {
+        try {
+            Long.parseLong(param[4]);
+            return true;
+        }catch (NumberFormatException ex) {
+            return false;
         }
     }
 
+    private boolean checkGender(String[] param) {
+        String regex = "[fm]";
+        return param[5].matches(regex);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        boolean endApp = false;
+        int errorCounter = 0, maxErrors = 3;
+
+        while (errorCounter < maxErrors && !endApp){
+            try{
+                RunApp();
+                endApp = true;
+            }catch (InputException ex){
+                errorCounter ++;
+                System.out.println(ex.getMessage());
+            }
+            finally {
+                if(!endApp){
+                    if(maxErrors - errorCounter == 0){
+                        System.out.println("Вы исчерпали все попытки, приложение закрывается.");
+                    }else {
+                        System.out.printf("Ошибка ввода, осталось %d попыток \n", maxErrors - errorCounter);
+                    }
+                }else{
+                    System.out.println("Программа завершилась без ошибок.");
+                }
+
+            }
+        }
+
+    }
+    static void RunApp() throws InputException {
+        DataParser dataParser = new DataParser();
+        int inputResult = dataParser.inputData("Введите данные: ");
+
+        switch (inputResult) {
+            case 0 -> dataParser.saveToFile();
+            case -1 -> throw new InputException("Размер введеных данных не корректен" + ", код ошибки " + inputResult);
+            case -2 -> throw new InputException("Количество указанных параметров не совпадает с форматом" +
+                    ", код ошибки " + inputResult);
+            case -3 -> throw new InputException("Параметр ФИО введён не корректрно!" + ", код ошибки " + inputResult);
+            case -4 -> throw new InputException("Параметр Дата введён не корректрно!" + ", код ошибки " + inputResult);
+            case -5 -> throw new InputException("Параметр Номер телефона введён не корректрно!" + ", код ошибки " + inputResult);
+            case -6 -> throw new InputException("Параметр Пол введён не корректрно!" + ", код ошибки " + inputResult);
+            default -> throw new InputException("Для кода данной ошибки пока нет описания" + ", код ошибки " + inputResult);
+        }
+    }
 }
